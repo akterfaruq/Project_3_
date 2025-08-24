@@ -1,0 +1,71 @@
+name: CICD pipeline
+
+on: [push]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Install Node jobs
+        uses: actions/setup-node@v4
+        with: 
+          node-version: "22"
+      - name: Install packages
+        run: npm install
+
+      - name: Run tests and capture output
+        run: |
+          mkdir -p artifacts
+          npm run check 2>&1 | tee atifacts/test-results.txt
+      
+      - name: Upload test tesults artifact
+        uses:  actions/upload-atifact@v4
+        with:
+          name: test=resukts
+          path: artifacts/test-results.txt 
+
+  
+
+  deploy:
+    needs: test
+    runs-on: self-hosted
+    steps:
+      - name:  Checkout The Code
+        uses: actions/checkout@v3
+
+      - name: Download test results
+        uses: actions/download-artifact@v4
+        with:
+            name: test-results
+            path: artifacts
+      
+      - name: Display test results
+        run: |
+          echo "== Test Results (from artifact) ===="
+          cat artifacts/test-results.txt
+          echo "===================================="
+      
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install The packages
+        run: npm install
+
+      - name: Run The Application By PM2
+        run: |
+          ls -a
+          pm2 status
+          # delete node-app process          
+          pm2 delete node-app || true
+
+          # Create a background process name node-app
+          pm2 start "npm status" --name="node-app"
+
+          # Save the process list
+          pm2 save
