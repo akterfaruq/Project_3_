@@ -8,7 +8,7 @@ jobs:
     steps:
 
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Install Node jobs
         uses: actions/setup-node@v4
@@ -23,7 +23,7 @@ jobs:
           npm run check 2>&1 | tee atifacts/test-results.txt
       
       - name: Upload test tesults artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: test=resukts
           path: artifacts/test-results.txt 
@@ -35,7 +35,7 @@ jobs:
     runs-on: self-hosted
     steps:
       - name:  Checkout The Code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Download test results
         uses: actions/download-artifact@v4
