@@ -23,7 +23,7 @@ jobs:
           npm run check 2>&1 | tee atifacts/test-results.txt
       
       - name: Upload test tesults artifact
-        uses:  actions/upload-atifact@v4
+        uses: actions/upload-artifact@v3
         with:
           name: test=resukts
           path: artifacts/test-results.txt 
