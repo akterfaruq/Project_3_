@@ -20,7 +20,8 @@ jobs:
       - name: Run tests and capture output
         run: |
           mkdir -p artifacts
-          npm run check 2>&1 | tee atifacts/test-results.txt
+          npm run check 2>&1 | tee artifacts/test-results.txt
+
       
       - name: Upload test tesults artifact
         uses: actions/upload-artifact@v4
