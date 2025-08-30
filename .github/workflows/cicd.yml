@@ -1,20 +1,19 @@
 name: CICD pipeline
 
-
 on: [push]
 
 jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Install Node jobs
+      - name: Install Node.js
         uses: actions/setup-node@v4
-        with: 
+        with:
           node-version: "22"
+
       - name: Install packages
         run: npm install
 
@@ -23,51 +22,46 @@ jobs:
           mkdir -p artifacts
           npm run check 2>&1 | tee artifacts/test-results.txt
 
-      
-      - name: Upload test tesults artifact
+      - name: Upload test results artifact
         uses: actions/upload-artifact@v4
         with:
-          name: test=resukts
-          path: artifacts/test-results.txt 
-
-  
+          name: test-results
+          path: artifacts/test-results.txt
 
   deploy:
     needs: test
-    runs-on: self-hosted
+    runs-on: self-hosted-p3
     steps:
-      - name:  Checkout The Code
+      - name: Checkout the code
         uses: actions/checkout@v4
 
       - name: Download test results
         uses: actions/download-artifact@v4
         with:
-            name: test-results
-            path: artifacts
-      
+          name: test-results
+          path: artifacts
+
       - name: Display test results
         run: |
           echo "== Test Results (from artifact) ===="
           cat artifacts/test-results.txt
           echo "===================================="
-      
-      - name: Setup Node
+
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '22'
 
-      - name: Install The packages
+      - name: Install packages
         run: npm install
 
-      - name: Run The Application By PM2
+      - name: Run the application by PM2
         run: |
           ls -a
           pm2 status
-          # delete node-app process          
+          # Delete node-app process if exists
           pm2 delete node-app || true
-
-          # Create a background process name node-app
-          pm2 start "npm status" --name="node-app"
-
+          # Start the app
+          pm2 start "npm start" --name="node-app"
           # Save the process list
           pm2 save
